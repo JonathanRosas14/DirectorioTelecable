@@ -95,7 +95,8 @@ const validCredentials = [
   { email: "retencioncomuneros@cablecauca.com", password: "retencioncomuneros123*" },
   { email: "subgerencia@cablecauca.com", password: "gerenciageneral123*" },
   { email: "recursoshumanos@cablecauca.com", password: "recursoshumanos123*" },
-  { email: "contabilidad@netteconecta.com ", password: "contabilidad123*" },
+  { email: "contabilidad@netteconecta.com", password: "contabilidad123*" },
+  { email: "proyectos.infraestructura@telecable.com.co", password: "proyectos123*"}
 ];
 
 const form = reactive({
