@@ -267,7 +267,7 @@ const desarrollosData = [
   },
   {
     nombre_desarrollo: "Desarrollo Talanga",
-    direccion_desarrollo: "CR 24G 86 01 - Floralia",
+    direccion_desarrollo: "CR 24G 86 01 - Talanga",
     ciudad_desarrollo: "Cali",
     departamento_desarrollo: "Valle del cauca",
     Encargado_desarrollo: "Lidia Karina Mariño",
@@ -279,6 +279,21 @@ const desarrollosData = [
       { nombre_plan: "300 Megas", precio_plan: "$80.000" },
     ],
     correo_desarrollo: "talanga.aak@gmail.com",
+  },
+  {
+    nombre_desarrollo: "Desarrollo Valle Grande",
+    direccion_desarrollo: "CL 82 23 113 - Valle Grande",
+    ciudad_desarrollo: "Cali",
+    departamento_desarrollo: "Valle del cauca",
+    Encargado_desarrollo: "Lidia Karina Mariño",
+    telefono_desarrollo: "3233727269",
+    barrios_desarrollo: ["Valle Grande"],
+    planes_desarrollo: [
+      { nombre_plan: "100 Megas", precio_plan: "$50.000" },
+      { nombre_plan: "200 Megas", precio_plan: "$70.000" },
+      { nombre_plan: "300 Megas", precio_plan: "$80.000" },
+    ],
+    correo_desarrollo: "fibravisiontv@gmail.com",
   },
 ];
 
