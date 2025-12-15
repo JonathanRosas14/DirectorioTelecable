@@ -463,10 +463,6 @@ const oficinasData = [
     ],
     puntosRecaudo: [
       {
-        nombre: "Punto de recaudo Oliva vivas",
-        direccion: "- CL 10 OESTE 50G 27",
-      },
-      {
         nombre: "Punto de recaudo Maitte Silva",
         direccion: "- CL 10 OESTE 49C 40",
       },
