@@ -1,13 +1,13 @@
 <template>
   <div class="infogeneral">
     <div class="info-header">
-      <h1 class="page-title">🏦 Información General</h1>
+      <h1 class="page-title">Informaci&oacute;n General</h1>
       <p class="page-subtitle">Cuentas bancarias, convenios y directorio corporativo</p>
     </div>
 
     <!-- Sección Cuentas Bancarias -->
     <div class="section-title">
-      <span class="section-icon">💳</span>
+      <span class="material-symbols-outlined section-icon">credit_card</span>
       <h2>Cuentas Bancarias y Convenios</h2>
     </div>
 
@@ -15,7 +15,7 @@
       <!-- Cuenta Telecable -->
       <div class="cuenta-card">
         <div class="cuenta-header telecable">
-          <div class="cuenta-icon">🏢</div>
+          <span class="material-symbols-outlined cuenta-icon">business</span>
           <div class="cuenta-info">
             <h2 class="cuenta-nombre">TELECABLE</h2>
             <div class="cuenta-detalles">
@@ -44,7 +44,7 @@
       <!-- Cuenta Home TV -->
       <div class="cuenta-card">
         <div class="cuenta-header hometv">
-          <div class="cuenta-icon">📺</div>
+          <span class="material-symbols-outlined cuenta-icon">tv</span>
           <div class="cuenta-info">
             <h2 class="cuenta-nombre">HOME TV</h2>
             <div class="cuenta-detalles">
@@ -76,7 +76,7 @@
       <!-- Cuenta Inversiones CYC -->
       <div class="cuenta-card">
         <div class="cuenta-header inversiones">
-          <div class="cuenta-icon">💼</div>
+          <span class="material-symbols-outlined cuenta-icon">work</span>
           <div class="cuenta-info">
             <h2 class="cuenta-nombre">INVERSIONES CYC</h2>
             <div class="cuenta-detalles">
@@ -107,7 +107,7 @@
 
     <!-- Sección Correos Corporativos -->
     <div class="section-title">
-      <span class="section-icon">📧</span>
+      <span class="material-symbols-outlined section-icon">mail</span>
       <h2>Correos Corporativos</h2>
     </div>
 
@@ -272,6 +272,15 @@ const correosData = [
 
 .section-icon {
   font-size: 28px;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(30, 60, 114, 0.08);
+  border-radius: 10px;
+  color: #1e3c72;
+  flex-shrink: 0;
 }
 
 .section-title h2 {
@@ -336,16 +345,16 @@ const correosData = [
 }
 
 .cuenta-icon {
-  font-size: 48px;
-  width: 80px;
-  height: 80px;
+  font-size: 32px;
+  width: 56px;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
-  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
   flex-shrink: 0;
+  color: white;
 }
 
 .cuenta-info {
