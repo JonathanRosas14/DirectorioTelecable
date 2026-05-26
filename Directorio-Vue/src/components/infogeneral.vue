@@ -536,14 +536,17 @@ const correosData = [
   color: #cbd5e1;
 }
 
-@media (max-width: 768px) {
-  .infogeneral {
-    padding: 20px;
-  }
+@media (max-width: 1024px) {
+  .infogeneral { padding: 32px 28px; }
+  .page-title { font-size: 36px; }
+  .section-title h2 { font-size: 22px; }
+}
 
-  .page-title {
-    font-size: 24px;
-  }
+@media (max-width: 768px) {
+  .infogeneral { padding: 24px 16px; }
+  .page-title { font-size: 30px; }
+  .page-desc { font-size: 16px; }
+  .section-title h2 { font-size: 20px; }
 
   .cuentas-grid {
     grid-template-columns: 1fr;
@@ -572,11 +575,21 @@ const correosData = [
   }
 
   .table-container {
-    overflow-x: scroll;
+    overflow-x: auto;
   }
 
   .correos-table {
     min-width: 700px;
   }
+}
+
+@media (max-width: 480px) {
+  .infogeneral { padding: 20px 12px; }
+  .page-title { font-size: 26px; }
+  .page-desc { font-size: 15px; }
+  .section-title h2 { font-size: 18px; }
+  .cuenta-header { padding: 20px; }
+  .cuenta-body { padding: 16px 20px; }
+  .ofi-tag { font-size: 12px; padding: 5px 10px; }
 }
 </style>

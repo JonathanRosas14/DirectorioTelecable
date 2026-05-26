@@ -1,11 +1,50 @@
-* {
+:root {
+  --teal: #003d9b;
+  --teal-light: #0052cc;
+  --teal-dark: #0040a2;
+  --terracotta: #004b59;
+  --terracotta-light: #006477;
+  --terracotta-dark: #004e5d;
+  --cream: #f1f3ff;
+  --cream-dark: #e8edff;
+  --warm-dark: #041b3c;
+  --warm-gray: #434654;
+  --warm-gray-light: #737685;
+  --warm-border: #c3c6d6;
+  --surface: #ffffff;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 61, 155, 0.08);
+  --shadow-lg: 0 8px 30px rgba(0, 61, 155, 0.12);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --font-heading: 'Hanken Grotesk', sans-serif;
+  --font-body: 'Hanken Grotesk', sans-serif;
+  --transition: 0.2s ease;
+}
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 body {
-  font-family: Arial, sans-serif;
-  color: #333;
-  padding: 15px;
+  font-family: var(--font-body);
+  color: var(--warm-dark);
+  background: #f9f9ff;
+  line-height: 1.6;
+}
+
+i.ph {
+  font-size: 1.25rem;
+  line-height: 1;
+  vertical-align: middle;
 }

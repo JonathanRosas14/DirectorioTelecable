@@ -1,96 +1,162 @@
 <template>
   <div class="layout">
     <header class="layout-header">
-      <div class="layout-header-logo">
-        <img src="../assets/Logo.png" alt="Telecable Logo" class="logo" />
-        <div class="logo-text">
-          <h1>Directorio Telecable</h1>
-          <p class="subtitle">Portal Corporativo</p>
+      <div class="header-inner">
+        <div class="header-left">
+          <button class="hamburger" @click="toggleMobileNav" aria-label="Men&uacute;">
+            <span class="material-symbols-outlined">menu</span>
+          </button>
+          <div class="header-logo">
+            <img src="../assets/Logo.png" alt="Telecable" class="logo" />
+          </div>
         </div>
-      </div>
-      
-      <nav class="layout-header-nav">
-        <router-link to="/home/oficinas" class="nav-link">
-          <span class="nav-icon">🏢</span>
-          <span>Oficinas</span>
-        </router-link>
-        <router-link to="/home/desarrollos" class="nav-link">
-          <span class="nav-icon">💻</span>
-          <span>Desarrollos</span>
-        </router-link>
-        <router-link to="/home/extensiones" class="nav-link">
-          <span class="nav-icon">📞</span>
-          <span>Extensiones</span>
-        </router-link>
-        <router-link to="/home/formularios" class="nav-link">
-          <span class="nav-icon">📋</span>
-          <span>Formularios</span>
-        </router-link>
 
-        <router-link to="/home/infogeneral" class="nav-link">
-          <span class="nav-icon">🏦</span>
-          <span>Información General</span>
-        </router-link>
-      </nav>
+        <nav class="header-nav">
+          <router-link to="/home/oficinas" class="nav-link" :class="{ active: $route.path === '/home/oficinas' }">
+            <span class="material-symbols-outlined">corporate_fare</span>
+            <span>Oficinas</span>
+          </router-link>
+          <router-link to="/home/desarrollos" class="nav-link" :class="{ active: $route.path === '/home/desarrollos' }">
+            <span class="material-symbols-outlined">language</span>
+            <span>Desarrollos</span>
+          </router-link>
+          <router-link to="/home/extensiones" class="nav-link" :class="{ active: $route.path === '/home/extensiones' }">
+            <span class="material-symbols-outlined">phone</span>
+            <span>Extensiones</span>
+          </router-link>
+          <router-link to="/home/formularios" class="nav-link" :class="{ active: $route.path === '/home/formularios' }">
+            <span class="material-symbols-outlined">description</span>
+            <span>Formularios</span>
+          </router-link>
+          <router-link to="/home/infogeneral" class="nav-link" :class="{ active: $route.path === '/home/infogeneral' }">
+            <span class="material-symbols-outlined">info</span>
+            <span>Informaci&oacute;n General</span>
+          </router-link>
+        </nav>
 
-      <div class="layout-header-actions">
-        <button class="user-menu" @click="toggleUserMenu">
-          <span class="user-avatar">👤</span>
-          <span class="user-name">Usuario</span>
-          <span class="dropdown-arrow">▼</span>
-        </button>
-        
-        <div v-if="showUserMenu" class="user-dropdown">
-          <div class="user-info">
-            <div class="user-info-avatar">👤</div>
-            <div class="user-info-text">
-              <p class="user-info-name">Usuario</p>
+        <!-- Mobile overlay -->
+        <div v-if="showMobileNav" class="mobile-overlay" @click="showMobileNav = false"></div>
+
+        <!-- Mobile drawer -->
+        <aside class="mobile-drawer" :class="{ open: showMobileNav }">
+          <div class="drawer-head">
+            <img src="../assets/Logo.png" alt="Telecable" class="drawer-logo" />
+            <button class="drawer-close" @click="showMobileNav = false">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+          <nav class="drawer-nav">
+            <router-link to="/home/oficinas" class="drawer-link" :class="{ active: $route.path === '/home/oficinas' }" @click="showMobileNav = false">
+              <span class="material-symbols-outlined">corporate_fare</span>
+              <span>Oficinas</span>
+            </router-link>
+            <router-link to="/home/desarrollos" class="drawer-link" :class="{ active: $route.path === '/home/desarrollos' }" @click="showMobileNav = false">
+              <span class="material-symbols-outlined">language</span>
+              <span>Desarrollos</span>
+            </router-link>
+            <router-link to="/home/extensiones" class="drawer-link" :class="{ active: $route.path === '/home/extensiones' }" @click="showMobileNav = false">
+              <span class="material-symbols-outlined">phone</span>
+              <span>Extensiones</span>
+            </router-link>
+            <router-link to="/home/formularios" class="drawer-link" :class="{ active: $route.path === '/home/formularios' }" @click="showMobileNav = false">
+              <span class="material-symbols-outlined">description</span>
+              <span>Formularios</span>
+            </router-link>
+            <router-link to="/home/infogeneral" class="drawer-link" :class="{ active: $route.path === '/home/infogeneral' }" @click="showMobileNav = false">
+              <span class="material-symbols-outlined">info</span>
+              <span>Informaci&oacute;n General</span>
+            </router-link>
+          </nav>
+          <div class="drawer-footer">
+            <button @click="handleLogout" class="drawer-logout">
+              <span class="material-symbols-outlined">logout</span>
+              <span>Cerrar Sesi&oacute;n</span>
+            </button>
+          </div>
+        </aside>
+
+        <div class="header-actions">
+          <button class="icon-btn">
+            <span class="material-symbols-outlined">notifications</span>
+          </button>
+          <button class="icon-btn">
+            <span class="material-symbols-outlined">settings</span>
+          </button>
+          <div class="user-area">
+            <button class="user-btn" @click="toggleUserMenu">
+              <div class="user-avatar">
+                <span class="material-symbols-outlined">person</span>
+              </div>
+              <span class="user-name">Admin Usuario</span>
+              <span class="material-symbols-outlined arrow">expand_more</span>
+            </button>
+
+            <div v-if="showUserMenu" class="user-dropdown">
+              <div class="dropdown-header">
+                <div class="dropdown-avatar">
+                  <span class="material-symbols-outlined">person</span>
+                </div>
+                <div>
+                  <p class="dropdown-name">Admin Usuario</p>
+                </div>
+              </div>
+              <div class="dropdown-divider"></div>
+              <button @click="handleLogout" class="dropdown-item">
+                <span class="material-symbols-outlined">logout</span>
+                <span>Cerrar Sesi&oacute;n</span>
+              </button>
             </div>
           </div>
-          <div class="dropdown-divider"></div>
-          <button @click="handleLogout" class="dropdown-item logout">
-            <span class="dropdown-icon">⬅</span>
-            <span>Cerrar Sesión</span>
-          </button>
         </div>
       </div>
     </header>
 
     <section class="content">
-      <!-- Aquí se renderiza el contenido dinámico -->
       <router-view></router-view>
     </section>
+
+    <footer class="layout-footer">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <span class="footer-brand-name">TeleCable</span>
+          <p>&copy; 2026 TeleCable &mdash; Directorio Interno Corporativo</p>
+        </div>
+        <div class="footer-links">
+          <a href="#">T&eacute;rminos y Condiciones</a>
+          <a href="#">Pol&iacute;tica de Privacidad</a>
+          <a href="#">Soporte T&eacute;cnico</a>
+        </div>
+      </div>
+    </footer>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
 
-const router = useRouter()
 const showUserMenu = ref(false)
+const showMobileNav = ref(false)
 
 const toggleUserMenu = () => {
   showUserMenu.value = !showUserMenu.value
 }
 
-const handleProfile = () => {
-  showUserMenu.value = false
-  console.log('Ir a perfil')
+const toggleMobileNav = () => {
+  showMobileNav.value = !showMobileNav.value
 }
 
 const handleLogout = () => {
   showUserMenu.value = false
   localStorage.removeItem('usuarioAutenticado')
-  router.push('/')
+  window.location.href = '/'
 }
 
 const handleClickOutside = (event) => {
-  const userMenu = document.querySelector('.user-menu')
+  const userBtn = document.querySelector('.user-btn')
   const dropdown = document.querySelector('.user-dropdown')
-  
-  if (userMenu && dropdown && 
-      !userMenu.contains(event.target) && 
+
+  if (userBtn && dropdown &&
+      !userBtn.contains(event.target) &&
       !dropdown.contains(event.target)) {
     showUserMenu.value = false
   }
@@ -110,61 +176,71 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: linear-gradient(to bottom, #f8f9fa 0%, #e9ecef 100%);
 }
 
 .layout-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 50px;
-  background: white;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  border-bottom: 2px solid #e2e8f0;
   position: sticky;
   top: 0;
   z-index: 100;
-  gap: 40px;
-  min-height: 90px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--warm-border);
 }
 
-.layout-header-logo {
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
   display: flex;
   align-items: center;
-  gap: 16px;
+  justify-content: space-between;
+  padding: 0 40px;
+  height: 80px;
+  gap: 24px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.hamburger {
+  display: none;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: var(--warm-gray);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.hamburger:hover {
+  background: var(--cream);
+  color: var(--teal);
+}
+
+.hamburger .material-symbols-outlined {
+  font-size: 24px;
+}
+
+.header-logo {
+  flex-shrink: 0;
 }
 
 .logo {
-  height: 70px;
-  width: 280px;
+  height: 44px;
+  width: auto;
   object-fit: contain;
-  border-radius: 8px;
 }
 
-.logo-text {
+.header-nav {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.logo-text h1 {
-  font-size: 26px;
-  font-weight: 700;
-  color: #1e3c72;
-  margin: 0;
-  line-height: 1;
-}
-
-.subtitle {
-  font-size: 14px;
-  color: #64748b;
-  font-weight: 500;
-  margin: 0;
-}
-
-.layout-header-nav {
-  display: flex;
-  gap: 12px;
+  align-items: center;
+  gap: 6px;
   flex: 1;
   justify-content: center;
 }
@@ -172,114 +248,135 @@ onUnmounted(() => {
 .nav-link {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
   text-decoration: none;
-  color: #334155;
-  padding: 14px 28px;
-  border-radius: 12px;
+  color: var(--warm-gray);
+  padding: 8px 14px;
+  font-size: 14px;
   font-weight: 600;
-  font-size: 16px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  background: transparent;
+  letter-spacing: 0.01em;
+  transition: color 0.2s;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
 }
 
-.nav-link::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%) scaleX(0);
-  width: 80%;
-  height: 3px;
-  background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
-  border-radius: 10px 10px 0 0;
-  transition: transform 0.3s ease;
+.nav-link .material-symbols-outlined {
+  font-size: 20px;
 }
 
 .nav-link:hover {
-  background: linear-gradient(135deg, rgba(42, 82, 152, 0.1) 0%, rgba(30, 60, 114, 0.1) 100%);
-  color: #1e3c72;
-  transform: translateY(-2px);
+  color: var(--teal);
 }
 
-.nav-link:hover::after {
-  transform: translateX(-50%) scaleX(1);
+.nav-link.active {
+  color: var(--teal);
+  border-bottom-color: var(--teal);
 }
 
-.nav-icon {
-  font-size: 22px;
-}
-
-.layout-header-actions {
+.header-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
-  position: relative;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
-.user-menu {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 20px;
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
-  background: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 600;
-  color: #334155;
-  font-size: 16px;
-}
-
-.user-menu:hover {
-  border-color: #2a5298;
-  background: #f8fafc;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(42, 82, 152, 0.15);
-}
-
-.user-avatar {
-  font-size: 24px;
-  width: 38px;
-  height: 38px;
+.icon-btn {
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: var(--warm-gray);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.icon-btn:hover {
+  background: var(--cream);
+  color: var(--teal);
+}
+
+.icon-btn .material-symbols-outlined {
+  font-size: 22px;
+}
+
+.user-area {
+  position: relative;
+  padding-left: 12px;
+  margin-left: 4px;
+  border-left: 1px solid var(--warm-border);
+}
+
+.user-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px 4px 4px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-body);
+}
+
+.user-btn:hover {
+  background: var(--cream);
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cream);
   border-radius: 50%;
-  filter: grayscale(100%) brightness(2);
+  border: 1px solid var(--warm-border);
+  color: var(--warm-gray);
 }
 
-.dropdown-arrow {
-  font-size: 10px;
-  transition: transform 0.3s ease;
-  color: #94a3b8;
+.user-avatar .material-symbols-outlined {
+  font-size: 20px;
 }
 
-.user-menu:hover .dropdown-arrow {
+.user-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--warm-dark);
+}
+
+.arrow {
+  font-size: 18px;
+  color: var(--warm-gray-light);
+  transition: transform 0.2s;
+}
+
+.user-btn:hover .arrow {
   transform: translateY(2px);
 }
 
 .user-dropdown {
   position: absolute;
-  top: calc(100% + 10px);
+  top: calc(100% + 8px);
   right: 0;
-  width: 280px;
-  background: white;
-  border: 1px solid #e2e8f0;
+  width: 240px;
+  background: var(--surface);
+  border: 1px solid var(--warm-border);
   border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-lg);
   z-index: 1000;
-  animation: dropdownSlide 0.3s ease;
   overflow: hidden;
+  animation: dropdownSlide 0.15s ease;
 }
 
 @keyframes dropdownSlide {
   from {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(-4px);
   }
   to {
     opacity: 1;
@@ -287,50 +384,243 @@ onUnmounted(() => {
   }
 }
 
-.user-info {
+.dropdown-header {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 16px;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
 }
 
-.user-info-avatar {
-  width: 48px;
-  height: 48px;
+.dropdown-avatar {
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+  background: var(--cream);
   border-radius: 50%;
-  font-size: 24px;
-  filter: grayscale(100%) brightness(2);
+  color: var(--warm-gray);
 }
 
-.user-info-text {
-  flex: 1;
+.dropdown-avatar .material-symbols-outlined {
+  font-size: 22px;
 }
 
-.user-info-name {
-  font-size: 16px;
-  font-weight: 700;
-  color: #1e293b;
-  margin: 0 0 4px 0;
-}
-
-.user-info-email {
-  font-size: 13px;
-  color: #64748b;
-  margin: 0;
+.dropdown-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--warm-dark);
 }
 
 .dropdown-divider {
   height: 1px;
-  background: #e2e8f0;
-  margin: 8px 0;
+  background: var(--warm-border);
 }
 
 .dropdown-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--warm-dark);
+  text-align: left;
+  font-family: var(--font-body);
+  transition: background 0.2s;
+}
+
+.dropdown-item:hover {
+  background: #ffdad6;
+  color: #93000a;
+}
+
+.dropdown-item .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.content {
+  flex: 1;
+}
+
+.layout-footer {
+  background: var(--cream);
+  border-top: 1px solid var(--warm-border);
+  padding: 14px 20px;
+}
+
+.footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.footer-brand-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--teal);
+}
+
+.footer-brand p {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--warm-gray-light);
+}
+
+.footer-links {
+  display: flex;
+  gap: 20px;
+}
+
+.footer-links a {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--warm-gray-light);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-links a:hover {
+  color: var(--teal);
+}
+
+@media (max-width: 640px) {
+  .footer-inner {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .footer-brand {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .footer-links {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+/* ===== MOBILE DRAWER ===== */
+.mobile-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 200;
+}
+
+.mobile-drawer {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 280px;
+  background: var(--surface);
+  z-index: 300;
+  flex-direction: column;
+  box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
+  transform: translateX(-100%);
+  transition: transform 0.25s ease;
+}
+
+.mobile-drawer.open {
+  transform: translateX(0);
+}
+
+.drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 16px;
+  border-bottom: 1px solid var(--warm-border);
+}
+
+.drawer-logo {
+  height: 32px;
+  width: auto;
+  object-fit: contain;
+}
+
+.drawer-close {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: var(--warm-gray);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.drawer-close:hover {
+  background: var(--cream);
+  color: var(--warm-dark);
+}
+
+.drawer-close .material-symbols-outlined {
+  font-size: 22px;
+}
+
+.drawer-nav {
+  flex: 1;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.drawer-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  text-decoration: none;
+  color: var(--warm-gray);
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.drawer-link:hover {
+  background: var(--cream);
+  color: var(--warm-dark);
+}
+
+.drawer-link.active {
+  background: var(--cream);
+  color: var(--teal);
+  font-weight: 600;
+}
+
+.drawer-link .material-symbols-outlined {
+  font-size: 22px;
+}
+
+.drawer-footer {
+  padding: 12px 8px;
+  border-top: 1px solid var(--warm-border);
+}
+
+.drawer-logout {
   width: 100%;
   display: flex;
   align-items: center;
@@ -338,85 +628,60 @@ onUnmounted(() => {
   padding: 12px 16px;
   background: transparent;
   border: none;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
   font-size: 15px;
   font-weight: 500;
-  color: #334155;
-  text-align: left;
+  color: var(--warm-gray);
+  font-family: var(--font-body);
+  transition: all 0.2s;
 }
 
-.dropdown-item:hover {
-  background: #f8fafc;
+.drawer-logout:hover {
+  background: #ffdad6;
+  color: #93000a;
 }
 
-.dropdown-item.logout {
-  color: #dc2626;
-}
-
-.dropdown-item.logout:hover {
-  background: #fef2f2;
-}
-
-.dropdown-icon {
-  font-size: 18px;
-  width: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.content {
-  flex: 1;
+.drawer-logout .material-symbols-outlined {
+  font-size: 22px;
 }
 
 @media (max-width: 1024px) {
-  .layout-header {
-    flex-wrap: wrap;
-    padding: 16px 20px;
+  .hamburger {
+    display: flex;
   }
 
-  .layout-header-nav {
-    width: 100%;
-    order: 3;
-    justify-content: flex-start;
-    overflow-x: auto;
-    padding-top: 12px;
-    border-top: 1px solid #e2e8f0;
-    margin-top: 12px;
+  .header-nav {
+    display: none;
   }
 
-  .nav-link {
-    font-size: 14px;
-    padding: 8px 16px;
-    white-space: nowrap;
+  .mobile-overlay,
+  .mobile-drawer {
+    display: flex;
+  }
+
+  .header-inner {
+    padding: 0 20px;
+    height: 64px;
   }
 }
 
 @media (max-width: 768px) {
   .logo {
-    height: 40px;
-    width: 160px;
-  }
-
-  .logo-text h1 {
-    font-size: 16px;
-  }
-
-  .subtitle {
-    display: none;
+    height: 32px;
   }
 
   .user-name {
     display: none;
   }
+}
 
-  .nav-link span:last-child {
-    display: none;
-  }
-
-  .nav-icon {
-    font-size: 20px;
-  }
+@media (max-width: 480px) {
+  .header-inner { padding: 0 12px; height: 56px; }
+  .logo { height: 26px; }
+  .drawer-inner { padding: 20px 16px; }
+  .footer-inner { flex-direction: column; text-align: center; gap: 8px; padding: 16px 20px; }
+  .footer-brand { flex-direction: column; gap: 4px; }
+  .footer-links { flex-wrap: wrap; justify-content: center; }
 }
 </style>

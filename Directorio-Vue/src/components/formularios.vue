@@ -1,439 +1,532 @@
 <template>
   <div class="layout-formularios">
-    <div class="formularios-header">
-      <div class="header-content">
-        <h1 class="page-title">Formularios de ventas</h1>
-        <p class="page-subtitle">Consulta los formularios de ventas</p>
+    <div class="page-head">
+      <div>
+        <h1 class="page-title">Formularios de Ventas</h1>
+        <p class="page-desc">Accede a los formularios de ventas de cada oficina</p>
       </div>
     </div>
 
-    <div class="filter-container">
-      <div class="filter-group">
-        <div class="filter-box">
-          <span class="filter-icon">🔍</span>
-          <input
-            v-model="filtroTexto"
-            type="text"
-            class="filter-input"
-            placeholder="Buscar por oficina..."
-          />
-        </div>
+    <div class="filter-bar">
+      <div class="search-wrap">
+        <span class="material-symbols-outlined search-icon">search</span>
+        <input v-model="filtroTexto" type="text" placeholder="Buscar por oficina..." />
       </div>
     </div>
 
-    <div class="stats-cards">
+    <div class="stats">
       <div class="stat-card">
-        <div class="stat-icon">📊</div>
-        <div class="stat-info">
-          <span class="stat-label">Total de formularios </span>
-          <span class="stat-value">{{ formulariosFiltrados.length }}</span>
+        <span class="material-symbols-outlined stat-icon">description</span>
+        <div>
+          <span class="stat-label">Total Formularios</span>
+          <span class="stat-val">{{ formulariosFiltrados.length }}</span>
         </div>
       </div>
-    </div>
-
-    <div class="table-card">
-      <div class="table-header">
-        <h2 class="table-title">Formularios de ventas</h2>
-        <span class="table-count"
-          >{{ formulariosFiltrados.length }} registros</span
-        >
+      <div class="stat-card">
+        <span class="material-symbols-outlined stat-icon">open_in_new</span>
+        <div>
+          <span class="stat-label">Enlaces activos</span>
+          <span class="stat-val">{{ formulariosFiltrados.length }}</span>
+        </div>
       </div>
     </div>
 
     <div class="table-container">
-      <table class="formulario-table">
-        <thead>
-          <tr>
-            <th>Formularios</th>
-            <th>Accion</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="(formularios, index) in formulariosFiltrados"
-            :key="index"
-            class="table-row"
-          >
-            <td class="formulario-nombre">
-              <div class="formulario-cell">
-                <span class="formulario-avatar">📋</span>
-                <span>{{ formularios.nombre_formulario }}</span>
-              </div>
-            </td>
-            <td>
-              <a
-                class="abrir-button"
-                :href=" formularios.enlace_formulario"
-                target="_blank"
-                rel="noopener noreferrer"
-                >Abrir Formulario</a
-              >
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="table-head">
+        <h2>Formularios de ventas</h2>
+        <span class="count-badge">{{ formulariosFiltrados.length }} registros</span>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Formulario</th>
+              <th>Acci&oacute;n</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(formulario, index) in formulariosPaginados" :key="index">
+              <td>
+                <div class="cell-name">
+                  <span class="material-symbols-outlined cell-icon">description</span>
+                  <span>{{ formulario.nombre_formulario }}</span>
+                </div>
+              </td>
+              <td>
+                <a class="btn-link" :href="formulario.enlace_formulario" target="_blank" rel="noopener noreferrer">
+                  Abrir
+                  <span class="material-symbols-outlined">open_in_new</span>
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div v-if="formulariosFiltrados.length === 0" class="empty">
+          <span class="material-symbols-outlined">search_off</span>
+          <h3>No se encontraron formularios</h3>
+          <p>Intenta ajustar los filtros de b&uacute;squeda</p>
+        </div>
+      </div>
+      <div class="table-foot">
+        <span class="foot-info" v-if="formulariosFiltrados.length > 0">
+          Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }} a {{ Math.min(currentPage * itemsPerPage, formulariosFiltrados.length) }} de {{ formulariosFiltrados.length }} registros
+        </span>
+        <div class="pagination" v-if="totalPages > 1">
+          <button class="page-btn" :disabled="currentPage === 1" @click="irPagina(currentPage - 1)">
+            <span class="material-symbols-outlined">chevron_left</span>
+          </button>
+          <button
+            v-for="pagina in totalPages"
+            :key="pagina"
+            class="page-btn"
+            :class="{ active: pagina === currentPage }"
+            @click="irPagina(pagina)"
+          >{{ pagina }}</button>
+          <button class="page-btn" :disabled="currentPage === totalPages" @click="irPagina(currentPage + 1)">
+            <span class="material-symbols-outlined">chevron_right</span>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 
 const filtroTexto = ref("");
+const currentPage = ref(1);
+const itemsPerPage = 6;
 
 const formulariosData = [
-  {
-    nombre_formulario: "Formulario de ventas Comuneros",
-    enlace_formulario:
-      "https://docs.google.com/forms/d/e/1FAIpQLSdVANncsap2oOAAaN86OD_zlejuOY1n5VN5739H5Qqpbq1Png/viewform",
-  },
-  {
-    nombre_formulario: "Formulario de ventas Rio Cauca",
-    enlace_formulario:
-      "https://docs.google.com/forms/d/e/1FAIpQLScbDDd-6MJbAVd4S9MFLWsoZhJfa2W1Rc6ZRIQWf8bImoT7aQ/viewform",
-  },
-  {
-    nombre_formulario: "Formulario de ventas Marroquin",
-    enlace_formulario:
-      "https://docs.google.com/forms/d/e/1FAIpQLScbb4OK4tuKYc7B_EW1nK3vPYTTqqEZVTmAWSww2n0FvXtNew/viewform",
-  },
-  {
-    nombre_formulario: "Formulario de ventas Ceibas",
-    enlace_formulario:
-      "https://docs.google.com/forms/d/e/1FAIpQLSetAURPhFQnpJWg8fbU894ZeVvGUmOXmDbhaazeSOS_kPBSkQ/viewform",
-  },
-  {
-    nombre_formulario:
-      "Formulario de ventas Cordoba Reservado - Antonio Nariño",
-    enlace_formulario:
-      "https://docs.google.com/forms/d/e/1FAIpQLSc6FRvX9jXrpmh8HOzUUcR9h3pqjAVVi0iAMLgLb1nsckM2zA/viewform",
-  },
-  {
-    nombre_formulario: "Formulario de ventas Poblado",
-    enlace_formulario:
-      "https://docs.google.com/forms/d/e/1FAIpQLSdczG_eYkGnkVQeAbD6yqEayA1xf6J06_DrETVwKx8fM7Vryg/viewform",
-  },
-  {
-    nombre_formulario: "Formulario de ventas Villa Nueva",
-    enlace_formulario:
-      "https://docs.google.com/forms/d/e/1FAIpQLSfOjhU9_vcKWzg6hWCxvBr1T8Kldp9Ar8xXO1Wzq97I3ZrPvQ/viewform",
-  },
-  {
-    nombre_formulario: "Formulario de ventas Chorros - Melendez",
-    enlace_formulario:
-      "https://docs.google.com/forms/d/e/1FAIpQLSf9s2z5CNpdAeyZJYi4av827rYU8VXz6iSPc8fT_DjGZmciMQ/viewform",
-  },
-  {
-    nombre_formulario: "Formulario de ventas Montebello",
-    enlace_formulario:
-      "https://docs.google.com/forms/d/e/1FAIpQLSflyRoGp8ZViYMdMV8cMGNiRpSybZ2lBChPY5j95tYDXYvYug/viewform",
-  },
-  {
-    nombre_formulario: "Formulario de ventas Siloe",
-    enlace_formulario:
-      "https://docs.google.com/forms/d/e/1FAIpQLSeVv5Xct_WuQUPXkaXAZjFolJuwLCw4JIP0b7XPRXtW8VCNpw/viewform",
-  },
-  {
-    nombre_formulario: "Formulario de ventas Florida",
-    enlace_formulario:
-      "https://docs.google.com/forms/d/e/1FAIpQLSdDsypy6ANvhb7f_leAsGVK_VNIX9v3mNtvBOCGhJF0TuBKEw/viewform",
-  },
-  {
-    nombre_formulario: "Formulario de ventas Pradera",
-    enlace_formulario:
-      "https://docs.google.com/forms/d/e/1FAIpQLSdytMnOmKLFoNpFUk-dnFwozxw4TbGzVGwcOjjXSpDs4Wctbw/viewform",
-  },
-  {
-    nombre_formulario: "Formulario de ventas Tulua - Andalucia - Cerrito",
-    enlace_formulario:
-      "https://docs.google.com/forms/d/e/1FAIpQLSf5cR6dwwfNPxNdOHqwvZgTLWCESaaLspF5aNDX8qnlPlDRYg/viewform",
-  },
-  {
-    nombre_formulario: "Formulario de ventas Tarqui - Huila - Altamira",
-    enlace_formulario:
-      "https://docs.google.com/forms/d/e/1FAIpQLSfwvswIcLy8qZSX8qw32D1p5yTgUwsXXbj4Gr-VKi8BvZfPmQ/viewform",
-  },
+  { nombre_formulario: "Formulario de ventas Comuneros", enlace_formulario: "https://docs.google.com/forms/d/e/1FAIpQLSdVANncsap2oOAAaN86OD_zlejuOY1n5VN5739H5Qqpbq1Png/viewform" },
+  { nombre_formulario: "Formulario de ventas Rio Cauca", enlace_formulario: "https://docs.google.com/forms/d/e/1FAIpQLScbDDd-6MJbAVd4S9MFLWsoZhJfa2W1Rc6ZRIQWf8bImoT7aQ/viewform" },
+  { nombre_formulario: "Formulario de ventas Marroquin", enlace_formulario: "https://docs.google.com/forms/d/e/1FAIpQLScbb4OK4tuKYc7B_EW1nK3vPYTTqqEZVTmAWSww2n0FvXtNew/viewform" },
+  { nombre_formulario: "Formulario de ventas Ceibas", enlace_formulario: "https://docs.google.com/forms/d/e/1FAIpQLSetAURPhFQnpJWg8fbU894ZeVvGUmOXmDbhaazeSOS_kPBSkQ/viewform" },
+  { nombre_formulario: "Formulario de ventas Cordoba Reservado - Antonio Nari&ntilde;o", enlace_formulario: "https://docs.google.com/forms/d/e/1FAIpQLSc6FRvX9jXrpmh8HOzUUcR9h3pqjAVVi0iAMLgLb1nsckM2zA/viewform" },
+  { nombre_formulario: "Formulario de ventas Poblado", enlace_formulario: "https://docs.google.com/forms/d/e/1FAIpQLSdczG_eYkGnkVQeAbD6yqEayA1xf6J06_DrETVwKx8fM7Vryg/viewform" },
+  { nombre_formulario: "Formulario de ventas Villa Nueva", enlace_formulario: "https://docs.google.com/forms/d/e/1FAIpQLSfOjhU9_vcKWzg6hWCxvBr1T8Kldp9Ar8xXO1Wzq97I3ZrPvQ/viewform" },
+  { nombre_formulario: "Formulario de ventas Chorros - Melendez", enlace_formulario: "https://docs.google.com/forms/d/e/1FAIpQLSf9s2z5CNpdAeyZJYi4av827rYU8VXz6iSPc8fT_DjGZmciMQ/viewform" },
+  { nombre_formulario: "Formulario de ventas Montebello", enlace_formulario: "https://docs.google.com/forms/d/e/1FAIpQLSflyRoGp8ZViYMdMV8cMGNiRpSybZ2lBChPY5j95tYDXYvYug/viewform" },
+  { nombre_formulario: "Formulario de ventas Siloe", enlace_formulario: "https://docs.google.com/forms/d/e/1FAIpQLSeVv5Xct_WuQUPXkaXAZjFolJuwLCw4JIP0b7XPRXtW8VCNpw/viewform" },
+  { nombre_formulario: "Formulario de ventas Florida", enlace_formulario: "https://docs.google.com/forms/d/e/1FAIpQLSdDsypy6ANvhb7f_leAsGVK_VNIX9v3mNtvBOCGhJF0TuBKEw/viewform" },
+  { nombre_formulario: "Formulario de ventas Pradera", enlace_formulario: "https://docs.google.com/forms/d/e/1FAIpQLSdytMnOmKLFoNpFUk-dnFwozxw4TbGzVGwcOjjXSpDs4Wctbw/viewform" },
+  { nombre_formulario: "Formulario de ventas Tulua - Andalucia - Cerrito", enlace_formulario: "https://docs.google.com/forms/d/e/1FAIpQLSf5cR6dwwfNPxNdOHqwvZgTLWCESaaLspF5aNDX8qnlPlDRYg/viewform" },
+  { nombre_formulario: "Formulario de ventas Tarqui - Huila - Altamira", enlace_formulario: "https://docs.google.com/forms/d/e/1FAIpQLSfwvswIcLy8qZSX8qw32D1p5yTgUwsXXbj4Gr-VKi8BvZfPmQ/viewform" },
 ];
 
 const formulariosFiltrados = computed(() => {
   return formulariosData.filter((formulario) => {
-    const matchTexto =
-      !filtroTexto.value ||
-      formulario.nombre_formulario
-        .toLowerCase()
-        .includes(filtroTexto.value.toLowerCase());
-
-    return matchTexto;
+    return !filtroTexto.value ||
+      formulario.nombre_formulario.toLowerCase().includes(filtroTexto.value.toLowerCase());
   });
 });
+
+const totalPages = computed(() => Math.max(1, Math.ceil(formulariosFiltrados.value.length / itemsPerPage)));
+
+const formulariosPaginados = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  return formulariosFiltrados.value.slice(start, start + itemsPerPage);
+});
+
+watch(filtroTexto, () => {
+  currentPage.value = 1;
+});
+
+const irPagina = (pagina) => {
+  if (pagina >= 1 && pagina <= totalPages.value) {
+    currentPage.value = pagina;
+  }
+};
 </script>
 
 <style scoped>
 .layout-formularios {
-  padding: 30px 40px;
-  background: linear-gradient(to bottom, #f8f9fa 0%, #e9ecef 100%);
-  min-height: calc(100vh - 90px);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 40px;
+  animation: fadeIn 0.3s ease;
 }
 
-.formularios-header {
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.page-head {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
-  flex-wrap: wrap;
+  align-items: flex-start;
+  margin-bottom: 28px;
   gap: 20px;
-}
-.header-content {
-  flex: 1;
 }
 
 .page-title {
-  font-size: 32px;
+  font-family: var(--font-heading);
+  font-size: 40px;
   font-weight: 700;
-  color: #1e3c72;
-  margin: 0 0 8px 0;
+  letter-spacing: -0.02em;
+  color: var(--warm-dark);
+  margin: 0 0 6px;
+  line-height: 1.1;
 }
 
-.page-subtitle {
-  font-size: 16px;
-  color: #64748b;
+.page-desc {
+  font-size: 18px;
+  color: var(--warm-gray);
   margin: 0;
 }
-.filter-container {
-  display: flex;
-  gap: 20px;
-  margin-bottom: 30px;
-  flex-wrap: wrap;
-}
 
-.filter-group {
+/* Filter Bar */
+.filter-bar {
   display: flex;
   gap: 16px;
-  flex-wrap: wrap;
-  flex: 1;
+  margin-bottom: 24px;
+  background: var(--cream);
+  padding: 20px 24px;
+  border-radius: 12px;
+  border: 1px solid var(--warm-border);
 }
 
-.filter-box {
+.search-wrap {
   flex: 1;
-  min-width: 300px;
   position: relative;
   display: flex;
   align-items: center;
-  background: white;
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 0 16px;
-  transition: all 0.3s ease;
-  height: 50px;
 }
 
-.filter-box:focus-within {
-  border-color: #2a5298;
-  box-shadow: 0 0 0 4px rgba(42, 82, 152, 0.08);
+.search-icon {
+  position: absolute;
+  left: 14px;
+  font-size: 22px;
+  color: var(--warm-gray-light);
+  pointer-events: none;
 }
 
-.filter-icon {
-  font-size: 20px;
-  color: #94a3b8;
-  margin-right: 12px;
-}
-
-.filter-input {
-  flex: 1;
-  border: none;
+.search-wrap input {
+  width: 100%;
+  padding: 12px 14px 12px 48px;
+  font-size: 16px;
+  font-family: var(--font-body);
+  background: var(--surface);
+  border: 1px solid var(--warm-border);
+  border-radius: 8px;
+  color: var(--warm-dark);
   outline: none;
-  padding: 14px 0;
-  font-size: 15px;
-  color: #1e293b;
-  background: transparent;
+  transition: all 0.2s;
 }
 
-.filter-input::placeholder {
-  color: #94a3b8;
+.search-wrap input:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(0, 61, 155, 0.12);
 }
-.stats-cards {
+
+.search-wrap input::placeholder {
+  color: var(--warm-gray-light);
+}
+
+/* Stats */
+.stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
-  margin-bottom: 30px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
 }
 
 .stat-card {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 24px;
-  background: white;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--warm-border);
   border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
+  transition: all 0.2s;
 }
 
 .stat-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  border-color: var(--teal);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
 }
 
 .stat-icon {
-  font-size: 40px;
-  width: 64px;
-  height: 64px;
+  font-size: 28px;
+  color: var(--teal);
+  width: 52px;
+  height: 52px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, rgba(42, 82, 152, 0.1) 0%, rgba(30, 60, 114, 0.1) 100%);
-  border-radius: 12px;
+  background: var(--cream);
+  border-radius: 10px;
+  flex-shrink: 0;
 }
 
-.stat-info {
+.stat-card div {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .stat-label {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
-  color: #64748b;
+  color: var(--warm-gray);
 }
 
-.stat-value {
-  font-size: 28px;
+.stat-val {
+  font-size: 26px;
   font-weight: 700;
-  color: #1e3c72;
+  color: var(--warm-dark);
 }
-.table-header {
+
+/* Table */
+.table-container {
+  background: var(--surface);
+  border: 1px solid var(--warm-border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.table-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 24px 30px;
-  border-bottom: 2px solid #e2e8f0;
+  padding: 20px 32px;
+  border-bottom: 1px solid var(--warm-border);
+  background: var(--surface);
 }
 
-.table-title {
-  font-size: 20px;
-  font-weight: 700;
-  color: #1e3c72;
+.table-head h2 {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--warm-dark);
   margin: 0;
 }
 
-.table-count {
-  font-size: 14px;
-  font-weight: 600;
-  color: #64748b;
-  background: #f1f5f9;
-  padding: 6px 14px;
+.count-badge {
+  background: var(--cream-dark);
+  color: var(--warm-gray);
+  padding: 4px 14px;
   border-radius: 20px;
-}
-.table-container {
-  overflow-x: auto;
-  padding: 0;
+  font-size: 12px;
+  font-weight: 600;
 }
 
-.formulario-table {
+.table-scroll {
+  overflow-x: auto;
+}
+
+table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.formulario-table thead {
-  background: #f8fafc;
+thead {
+  background: var(--cream);
 }
 
-.formulario-table th {
-  padding: 16px 20px;
+th {
+  padding: 14px 32px 14px 32px;
   text-align: left;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
-  color: #64748b;
+  color: var(--warm-gray);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-bottom: 2px solid #e2e8f0;
+  letter-spacing: 0.05em;
 }
 
-.table-row {
-  transition: all 0.2s ease;
-  border-bottom: 1px solid #f1f5f9;
+th:first-child {
+  padding-left: 32px;
 }
 
-.table-row:hover {
-  background: #f8fafc;
+th:last-child {
+  padding-right: 32px;
 }
 
-.formulario-table td {
-  padding: 18px 20px;
-  font-size: 15px;
-  color: #334155;
+tbody tr:nth-child(even) {
+  background: rgba(232, 237, 255, 0.3);
 }
 
-.formulario-cell {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+tbody tr:hover {
+  background: rgba(0, 61, 155, 0.04);
 }
 
-.formulario-avatar {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
-  border-radius: 50%;
-  font-size: 20px;
-  filter: grayscale(100%) brightness(2);
+td {
+  padding: 18px 12px;
+  font-size: 16px;
+  color: var(--warm-dark);
+  border-bottom: 1px solid var(--warm-border);
+  vertical-align: middle;
 }
 
-.formulario-nombre {
-  font-weight: 600;
-  color: #1e3c72;
+td:first-child {
+  padding-left: 32px;
 }
 
-.abrir-button {
+td:last-child {
+  padding-right: 32px;
+}
+
+.cell-name {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px 20px;
-  background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
-  color: white;
-  text-decoration: none;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(42, 82, 152, 0.3);
+  gap: 10px;
+  font-weight: 500;
 }
 
-.abrir-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(42, 82, 152, 0.4);
+.cell-icon {
+  font-size: 22px;
+  color: var(--teal);
+}
+
+.btn-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  background: var(--teal);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s;
+  font-family: var(--font-body);
+}
+
+.btn-link:hover {
+  background: var(--teal-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 61, 155, 0.25);
+}
+
+.btn-link .material-symbols-outlined {
+  font-size: 16px;
+}
+
+/* Table Footer / Pagination */
+.table-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 32px;
+  border-top: 1px solid var(--warm-border);
+  background: var(--surface);
+}
+
+.foot-info {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--warm-gray);
+}
+
+.pagination {
+  display: flex;
+  gap: 6px;
+}
+
+.page-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--warm-border);
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  color: var(--warm-dark);
+  transition: all 0.2s;
+}
+
+.page-btn:hover:not(:disabled):not(.active) {
+  background: var(--cream);
+}
+
+.page-btn.active {
+  background: var(--teal);
+  color: white;
+  border-color: var(--teal);
+}
+
+.page-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.page-btn .material-symbols-outlined {
+  font-size: 18px;
+}
+
+/* Empty state */
+.empty {
+  text-align: center;
+  padding: 64px 20px;
+}
+
+.empty .material-symbols-outlined {
+  font-size: 40px;
+  color: var(--warm-gray-light);
+  margin-bottom: 12px;
+}
+
+.empty h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--warm-dark);
+  margin-bottom: 6px;
+}
+
+.empty p {
+  font-size: 14px;
+  color: var(--warm-gray);
+}
+
+@media (max-width: 1024px) {
+  .layout-formularios { padding: 32px 28px; }
+  .page-title { font-size: 36px; }
 }
 
 @media (max-width: 768px) {
-  .layout-formularios {
-    padding: 20px;
-  }
+  .layout-formularios { padding: 24px 16px; }
+  .page-head { flex-direction: column; }
+  .page-title { font-size: 32px; }
+  .page-desc { font-size: 16px; }
 
-  .page-title {
-    font-size: 24px;
-  }
-
-  .filter-container {
+  .filter-bar {
     flex-direction: column;
+    padding: 16px;
   }
 
-  .filter-box {
-    min-width: 100%;
-  }
+  .stats { grid-template-columns: 1fr; }
 
-  .table-container {
-    overflow-x: scroll;
-  }
+  table { min-width: 720px; }
 
-  .formulario-table {
-    min-width: 600px;
-  }
+  .table-foot { flex-direction: column; gap: 12px; }
 }
 
-
+@media (max-width: 480px) {
+  .layout-formularios { padding: 20px 12px; }
+  .page-title { font-size: 28px; }
+  .page-desc { font-size: 15px; }
+  .filter-bar { padding: 12px; gap: 10px; }
+  .search-wrap input { font-size: 15px; padding: 10px 14px 10px 44px; }
+  td { font-size: 15px; padding: 14px 8px; }
+  .table-head, .table-foot { padding: 14px 20px; }
+  th { padding: 12px 20px; }
+  td:first-child { padding-left: 20px; }
+  th:first-child { padding-left: 20px; }
+  .stat-card { padding: 16px; }
+  .stat-val { font-size: 22px; }
+  .btn-link { padding: 8px 14px; font-size: 13px; }
+  .empty { padding: 40px 16px; }
+  .foot-info { font-size: 11px; }
+}
 </style>
